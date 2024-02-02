@@ -1,7 +1,6 @@
-﻿using INF11207.TP1.Core;
-using INF11207.TP1.CsvFileHandling;
+﻿using INF11207.TP1.CsvFileHandling;
 
-namespace INF11207.TP1.ID3;
+namespace INF11207.TP1.Core;
 
 public class Ensemble : TrackableObject, IObserver
 {
@@ -78,12 +77,11 @@ public class Ensemble : TrackableObject, IObserver
     public static IList<Exemple> ListeEnExemples(string[] exemples, IList<string> nomAttributs)
     {
         IList<Exemple> retour = new List<Exemple>();
-        nomAttributs.Remove("Classe");
 
         foreach (string ligne in exemples)
         {
             string[] attributs = ligne.Split(',');
-            string etiquette = attributs.Last();
+            string etiquette = attributs.Length != nomAttributs.Count ? attributs.Last() : "";
 
             retour.Add(new Exemple(nomAttributs, 
                 attributs[0..nomAttributs.Count].ToList(), 

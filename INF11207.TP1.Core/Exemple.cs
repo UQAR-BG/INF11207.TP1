@@ -1,6 +1,6 @@
 ﻿using INF11207.TP1.Core.Exceptions;
 
-namespace INF11207.TP1.ID3;
+namespace INF11207.TP1.Core;
 
 public class Exemple
 {
@@ -21,7 +21,7 @@ public class Exemple
         }
     }
 
-    public string Attribut(string nomAttribut) 
+    public string GetValeur(string nomAttribut) 
     {
         return Attributs[nomAttribut];
     }

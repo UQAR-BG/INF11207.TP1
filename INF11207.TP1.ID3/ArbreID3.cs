@@ -1,36 +1,34 @@
-﻿using INF11207.TP1.Core.Exceptions;
+﻿using INF11207.TP1.Core;
+using INF11207.TP1.Core.Exceptions;
 
 namespace INF11207.TP1.ID3;
 
-public class ArbreID3
+public class ArbreID3 : Arbre
 {
-    public Ensemble Ensemble {  get; init; }
-    public NoeudAbstrait Arbre { get; private set; }
-
     public ArbreID3 (string chemin = "")
     {
         Ensemble = new Ensemble(chemin);
     }
 
-    public void Construire()
+    public override void Construire()
     {
-        Arbre = ConstruireArbre(Ensemble);
+        Racine = ConstruireArbre(Ensemble);
     }
 
-    public void Afficher()
+    public override void Afficher()
     {
-        AfficherArbre(Arbre);
+        AfficherArbre(Racine);
     }
 
-    public string Etiqueter(Exemple exemple)
+    public override string Etiqueter(Exemple exemple)
     {
-        NoeudAbstrait noeudActuel = Arbre;
-        string nomAttribut;
+        NoeudAbstrait noeudActuel = Racine;
+        string valeur;
 
         while (!noeudActuel.IsFeuille)
         {
-            nomAttribut = exemple.Attribut(noeudActuel.Etiquette);
-            noeudActuel = noeudActuel.Enfants[nomAttribut];
+            valeur = exemple.GetValeur(noeudActuel.Etiquette);
+            noeudActuel = noeudActuel.Enfants[valeur];
         }
 
         return noeudActuel.Etiquette;
