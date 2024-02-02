@@ -8,7 +8,7 @@ Console.WriteLine("This is a simple app to demonstrate the ID3 decision tree alg
 //string chemin = "C:\\Users\\goulba01\\source\\repos\\id3_train_reduced.csv";
 string chemin = "/home/bastiengoulet/dev/INF11207.TP1/Data/id3_train_reduced.csv";
 
-ArbreID3 arbre = new ArbreID3(chemin);
+Arbre arbre = new ArbreID3(chemin);
 arbre.Construire();
 
 arbre.Afficher();
