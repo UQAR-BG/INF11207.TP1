@@ -1,4 +1,5 @@
-﻿using INF11207.TP1.CsvFileHandling;
+﻿using INF11207.TP1.Core.Calculs;
+using INF11207.TP1.CsvFileHandling;
 
 namespace INF11207.TP1.Core;
 
@@ -50,8 +51,21 @@ public class Ensemble : TrackableObject, IObserver
         get
         {
             if (NeedsUpdating)
-                _entropie = CalculerEntropie();
+                _entropie = Registry.CreateAndRegister<CalculEntropie>(CalculEntropie.Id)
+                    .Calculer(this);
             return _entropie;
+        }
+    }
+
+    private IList<string> _etiquettes;
+    public IList<string> Etiquettes
+    {
+        get
+        {
+            if (NeedsUpdating)
+                _etiquettes = new UniqueList<string>(
+                    Exemples.Select(e => e.Etiquette));
+            return _etiquettes;
         }
     }
 
@@ -91,66 +105,19 @@ public class Ensemble : TrackableObject, IObserver
         return retour;
     }
 
-    public IList<string> EtiquettesPossibles()
-    {
-        IList<string> retour = new List<string>();
-
-        foreach (Exemple exemple in Exemples)
-        {
-            if (!retour.Contains(exemple.Etiquette))
-                retour.Add(exemple.Etiquette);
-        }
-
-        return retour;
-    }
-
     public Ensemble SousEnsembleEtiquette(string etiquette)
     {
-        Ensemble retour = new();
-        retour.Attributs = Attributs;
-
-        foreach (Exemple exemple in Exemples)
+        return new Ensemble
         {
-            if (exemple.Etiquette.Equals(etiquette))
-                retour.Exemples.Add(exemple);
-        }
-
-        return retour;
-    }
-
-    public string AttributOptimal(bool ID3 = true)
-    {
-        double max = double.NegativeInfinity;
-        double gain;
-        string retour = string.Empty;
-
-        foreach (string attribut in Attributs)
-        {
-            gain = CalculerGainEntropie(attribut);
-
-            if (gain >= max)
-            {
-                max = gain;
-                retour = attribut;
-            }
-        }
-
-        return retour;
+            Attributs = Attributs,
+            Exemples = Exemples.Where(e => e.Etiquette.Equals(etiquette)).ToList()
+        };
     }
 
     public IList<string> ValeursPossiblesAttribut(string nomAttribut)
     {
-        IList<string> retour = new List<string>();
-
-        foreach (Exemple exemple in Exemples)
-        {
-            string attribut = exemple.Attributs[nomAttribut];
-
-            if (!retour.Contains(attribut))
-                retour.Add(attribut);
-        }
-
-        return retour;
+        return new UniqueList<string>(
+            Exemples.Select(e => e.GetValeur(nomAttribut)));
     }
 
     public Ensemble SousEnsembleAttribut(string nomAttribut, string valeur)
@@ -158,45 +125,8 @@ public class Ensemble : TrackableObject, IObserver
         Ensemble retour = new Ensemble();
         retour.Attributs = new List<string>(Attributs);
         retour.Attributs.Remove(nomAttribut);
-
-        foreach (Exemple exemple in Exemples)
-        {
-            if (exemple.Attributs[nomAttribut].Equals(valeur))
-                retour.Exemples.Add(exemple);
-        }
+        retour.Exemples = Exemples.Where(e => e.GetValeur(nomAttribut).Equals(valeur)).ToList();
 
         return retour;
-    }
-
-    private double CalculerEntropie()
-    {
-        double retour = 0;
-        Ensemble sousEnsemble;
-        int longueurSousEnsemble;
-
-        foreach (string etiquette in EtiquettesPossibles())
-        {
-            sousEnsemble = SousEnsembleEtiquette(etiquette);
-            longueurSousEnsemble = sousEnsemble.Length;
-
-            retour += longueurSousEnsemble * Math.Log2(longueurSousEnsemble);
-        }
-
-        return Math.Log2(Length) - (retour / Length);
-    }
-
-    private double CalculerGainEntropie(string nomAttribut)
-    {
-        double somme = 0;
-        Ensemble sousEnsemble;
-
-        foreach (string valeur in ValeursPossiblesAttribut(nomAttribut))
-        {
-            sousEnsemble = SousEnsembleAttribut(nomAttribut, valeur);
-
-            somme += sousEnsemble.Length * sousEnsemble.Entropie;
-        }
-
-        return Entropie - (somme / Length);
     }
 }

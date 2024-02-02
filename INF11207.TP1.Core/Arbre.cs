@@ -1,11 +1,20 @@
+using INF11207.TP1.Core.Calculs;
 using INF11207.TP1.Core.Exceptions;
 
 namespace INF11207.TP1.Core;
 
 public abstract class Arbre
 {
+    private readonly ICalculAttributOptimal _attributOptimal;
+    
     public Ensemble Ensemble {  get; protected set; }
     public NoeudAbstrait Racine { get; protected set; }
+
+    public Arbre(ICalculAttributOptimal strategie, string chemin = "")
+    {
+        _attributOptimal = strategie;
+        Ensemble = new Ensemble(chemin);
+    }
     
     public virtual void Construire()
     {
@@ -29,6 +38,11 @@ public abstract class Arbre
         }
 
         return noeudActuel.Etiquette;
+    }
+    
+    protected virtual Ensemble PreparerDonnees(Ensemble ensemble)
+    {
+        return ensemble;
     }
 
     private NoeudAbstrait ConstruireArbre(Ensemble ensemble)
@@ -56,11 +70,10 @@ public abstract class Arbre
 
         return noeud;
     }
-    protected abstract string ChoisirAttributATester(Ensemble ensemble);
 
-    protected virtual Ensemble PreparerDonnees(Ensemble ensemble)
+    private string ChoisirAttributATester(Ensemble ensemble)
     {
-        return ensemble;
+        return _attributOptimal.Calculer(ensemble);
     }
 
     private void AfficherArbre(NoeudAbstrait arbre, int nbTabs = 0)
@@ -91,7 +104,7 @@ public abstract class Arbre
         int max = 0;
         string etiquettePlusFrequente = string.Empty;
 
-        foreach(string etiquette in ensemble.EtiquettesPossibles())
+        foreach(string etiquette in ensemble.Etiquettes)
         {
             Ensemble sousEnsemble = ensemble.SousEnsembleEtiquette(etiquette);
             if (sousEnsemble.Length > max)
