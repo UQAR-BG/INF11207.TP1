@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Collections\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\INF11207.TP1.CsvFileHandling\INF11207.TP1.CsvFileHandling.csproj" />
   </ItemGroup>
 

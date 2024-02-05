@@ -129,4 +129,33 @@ public class Ensemble : TrackableObject, IObserver
 
         return retour;
     }
+
+    public IList<Tuple<string, IList<string>>> SauvegarderValeursDiscretes()
+    {
+        IList<Tuple<string, IList<string>>> retour = new List<Tuple<string, IList<string>>>();
+
+        foreach (string attr in Attributs)
+        {
+            if (EstDiscretisable(attr))
+            {
+                IList<string> valeurs = Exemples.Select(e => e.GetValeur(attr)).ToList();
+                retour.Add(new Tuple<string, IList<string>>(attr, valeurs));
+            }
+        }
+        
+        return retour;
+    }
+
+    private bool EstDiscretisable(string attribut)
+    {
+        int i = 0;
+        bool tousDiscretisable = true;
+        while (tousDiscretisable && i < Exemples.Count)
+        {
+            tousDiscretisable = double.TryParse(Exemples[i].GetValeur(attribut), out var result);
+            i++;
+        }
+
+        return tousDiscretisable;
+    }
 }
