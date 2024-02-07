@@ -34,14 +34,21 @@ public abstract class Arbre
         while (!noeudActuel.IsFeuille)
         {
             valeur = exemple.GetValeur(noeudActuel.Etiquette);
-            noeudActuel = noeudActuel.Enfants[valeur];
+            noeudActuel = noeudActuel[valeur];
         }
 
         return noeudActuel.Etiquette;
     }
     
-    protected virtual Ensemble PreparerDonnees(Ensemble ensemble)
+    protected virtual Ensemble Discretiser(Ensemble ensemble)
     {
+        var sauvegardeValeurs = ensemble.SauvegarderValeursDiscretes();
+
+        foreach (var tuple in sauvegardeValeurs)
+        {
+
+        }
+
         return ensemble;
     }
 
@@ -56,7 +63,7 @@ public abstract class Arbre
         if (ensemble.Largeur == 0)
             return GenererFeuilleAPartirDe(ensemble);
 
-        ensemble = PreparerDonnees(ensemble);
+        ensemble = Discretiser(ensemble);
         string aTester = ChoisirAttributATester(ensemble);
         
         NoeudAbstrait noeud = new Noeud(aTester);
@@ -65,7 +72,7 @@ public abstract class Arbre
         {
             Ensemble sousEnsemble = ensemble.SousEnsembleAttribut(aTester, valeur);
 
-            noeud.Enfants[valeur] = ConstruireArbre(sousEnsemble);
+            noeud[valeur] = ConstruireArbre(sousEnsemble);
         }
 
         return noeud;
@@ -87,7 +94,7 @@ public abstract class Arbre
                 foreach (string enfant in arbre.Enfants.Keys)
                 {
                     Console.WriteLine(new string('\t', nbTabs) + '-' + enfant);
-                    AfficherArbre(arbre.Enfants[enfant], nbTabs + 1);
+                    AfficherArbre(arbre[enfant], nbTabs + 1);
                 }
 
                 break;

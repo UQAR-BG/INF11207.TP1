@@ -146,6 +146,52 @@ public class Ensemble : TrackableObject, IObserver
         return retour;
     }
 
+    public void Discretiser(string attribut)
+    {
+        List<Tuple<double, double>> listeIntervalles = new();
+
+        List<Tuple<int, string>> valeursTriees = new();
+        for (int i = 0; i < Length; i++)
+            valeursTriees.Add(new Tuple<int, string>(i, Exemples[i].GetValeur(attribut)));
+
+        valeursTriees.OrderBy(t => t.Item2);
+        int indiceBorneInf = 0;
+
+        for (int i = 1; i < valeursTriees.Count; i++)
+        {
+            double borneInf, borneSup;
+
+            if (!Exemples[valeursTriees[i].Item1].Etiquette.Equals(Exemples[valeursTriees[indiceBorneInf].Item1].Etiquette))
+            {
+                if (listeIntervalles.Count == 0)
+                    borneInf = double.NegativeInfinity;
+                else
+                    borneInf = (double.Parse(valeursTriees[indiceBorneInf].Item2) + 
+                        double.Parse(valeursTriees[indiceBorneInf - 1].Item2)) / 2;
+
+                borneSup = (double.Parse(valeursTriees[i].Item2) +
+                        double.Parse(valeursTriees[i - 1].Item2)) / 2;
+
+                listeIntervalles.Add(new Tuple<double, double>(borneInf, borneSup));
+                indiceBorneInf = i;
+            }
+        }
+
+        int indiceFinal = listeIntervalles.Count - 1;
+        listeIntervalles.Add(new Tuple<double, double>(listeIntervalles[indiceFinal].Item2, double.PositiveInfinity));
+
+        foreach (Exemple exemple in Exemples)
+        {
+            foreach (var intervalle in listeIntervalles)
+            {
+                if (double.Parse(exemple.GetValeur(attribut)) < intervalle.Item2)
+                {
+
+                }
+            }
+        }
+    }
+
     private bool EstDiscretisable(string attribut)
     {
         int i = 0;

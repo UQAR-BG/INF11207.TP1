@@ -4,24 +4,24 @@ namespace INF11207.TP1.Core;
 
 public class Exemple
 {
-    public Dictionary<string, string> Attributs { get; init; }
+    public Dictionary<string, ValeurAttribut> Attributs { get; init; }
     public string Etiquette { get; init; }
 
     public Exemple (IList<string> nomsAttributs, IList<string> valeursAttributs, string etiquette = "")
     {
         Etiquette = etiquette;
-        Attributs = new Dictionary<string, string> ();
+        Attributs = new Dictionary<string, ValeurAttribut> ();
 
         if (!AttributsCompatibles(nomsAttributs, valeursAttributs))
             throw new ExempleEtListAttributsIncompatibleException();
 
         for (int i = 0; i < nomsAttributs.Count; i++)
         {
-            Attributs.Add(nomsAttributs[i], valeursAttributs[i]);
+            Attributs.Add(nomsAttributs[i], new ValeurAttribut(valeursAttributs[i]));
         }
     }
 
-    public string GetValeur(string nomAttribut) 
+    public ValeurAttribut GetValeur(string nomAttribut) 
     {
         return Attributs[nomAttribut];
     }
