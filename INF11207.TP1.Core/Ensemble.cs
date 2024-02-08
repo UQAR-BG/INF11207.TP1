@@ -94,8 +94,10 @@ public class Ensemble : TrackableObject, IObserver
 
         foreach (string ligne in exemples)
         {
-            string[] attributs = ligne.Split(',');
-            string etiquette = attributs.Length != nomAttributs.Count ? attributs.Last() : "";
+            string[] attributs = ligne.Split(';');
+            string etiquette = attributs.Last();
+            if (attributs.Length == nomAttributs.Count)
+                nomAttributs.RemoveAt(attributs.Length - 1);
 
             retour.Add(new Exemple(nomAttributs, 
                 attributs[0..nomAttributs.Count].ToList(), 

@@ -56,6 +56,8 @@ public abstract class Arbre
         if (ensemble.Largeur == 0)
             return GenererFeuilleAPartirDe(ensemble);
 
+        var sauvegardeValeurs = ensemble.SauvegarderValeursDiscretes();
+
         ensemble = PreparerDonnees(ensemble);
         string aTester = ChoisirAttributATester(ensemble);
         

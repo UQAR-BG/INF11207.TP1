@@ -17,7 +17,7 @@ public class CalculSplit : ICalculAvecAttribut, IIdentifiable
         {
             Ensemble sousEnsemble = ensemble.SousEnsembleAttribut(attribut, valeur);
 
-            retour += sousEnsemble.Length * Math.Log2(sousEnsemble.Entropie);
+            retour += sousEnsemble.Length * Math.Log2(sousEnsemble.Length);
         }
 
         return Math.Log2(ensemble.Length) - retour / ensemble.Length;
