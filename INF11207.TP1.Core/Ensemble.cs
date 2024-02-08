@@ -148,6 +148,56 @@ public class Ensemble : TrackableObject, IObserver
         return retour;
     }
 
+    public List<Tuple<double, double>> Discretiser(string attribut)
+    {
+        List<Tuple<double, double>> listeIntervalles = new();
+
+        List<Tuple<int, double>> valeursTriees = new();
+        for (int i = 0; i < Length; i++)
+            valeursTriees.Add(new Tuple<int, double>(i, double.Parse(Exemples[i].GetValeur(attribut))));
+
+        valeursTriees.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+        int indiceBorneInf = 0;
+        double borneInf = double.NegativeInfinity;
+        string classe = Exemples[valeursTriees[0].Item1].Etiquette;
+
+        for (int i = 1; i < valeursTriees.Count; i++)
+        {
+            double borneSup;
+
+            if (!Exemples[valeursTriees[i].Item1].Etiquette.Equals(classe))
+            {
+                //if (listeIntervalles.Count == 0)
+                //    borneInf = double.NegativeInfinity;
+                //else
+                //    borneInf = (double.Parse(valeursTriees[indiceBorneInf].Item2) +
+                //        double.Parse(valeursTriees[indiceBorneInf - 1].Item2)) / 2;
+
+                borneSup = (valeursTriees[i].Item2 +
+                        valeursTriees[i - 1].Item2) / 2;
+
+                listeIntervalles.Add(new Tuple<double, double>(borneInf, borneSup));
+                indiceBorneInf = i;
+                borneInf = borneSup;
+                classe = Exemples[valeursTriees[i].Item1].Etiquette;
+            }
+        }
+
+        listeIntervalles.Add(new Tuple<double, double>(borneInf, double.PositiveInfinity));
+        return listeIntervalles;
+
+        //foreach (Exemple exemple in Exemples)
+        //{
+        //    foreach (var intervalle in listeIntervalles)
+        //    {
+        //        if (double.Parse(exemple.GetValeur(attribut)) < intervalle.Item2)
+        //        {
+
+        //        }
+        //    }
+        //}
+    }
+
     private bool EstDiscretisable(string attribut)
     {
         int i = 0;

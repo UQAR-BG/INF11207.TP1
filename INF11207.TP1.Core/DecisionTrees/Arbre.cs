@@ -1,5 +1,6 @@
 using INF11207.TP1.Core.Calculs;
 using INF11207.TP1.Core.Exceptions;
+using System.Collections.Generic;
 
 namespace INF11207.TP1.Core;
 
@@ -62,10 +63,18 @@ public abstract class Arbre
         string aTester = ChoisirAttributATester(ensemble);
         
         NoeudAbstrait noeud = new Noeud(aTester);
+        List<Tuple<double, double>>? intervalles = null;
+        if (sauvegardeValeurs.Any(t => t.Item1.Equals(aTester)))
+            intervalles = ensemble.Discretiser(aTester);
 
         foreach (string valeur in ensemble.ValeursPossiblesAttribut(aTester))
         {
             Ensemble sousEnsemble = ensemble.SousEnsembleAttribut(aTester, valeur);
+            if (sauvegardeValeurs.Any(t => t.Item1.Equals(aTester)))
+            {
+                double valDiscrete = double.Parse(valeur);
+                var intervalle = intervalles.First(i => valDiscrete >= i.Item1 && valDiscrete < i.Item2);
+            }
 
             noeud.Enfants[valeur] = ConstruireArbre(sousEnsemble);
         }
