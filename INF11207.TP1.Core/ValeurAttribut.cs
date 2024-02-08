@@ -1,6 +1,6 @@
 ﻿namespace INF11207.TP1.Core;
 
-public class ValeurAttribut
+public class ValeurAttribut : IEquatable<string>, IEquatable<double>
 {
     public string Valeur { get; private set; } = string.Empty;
 
@@ -22,6 +22,16 @@ public class ValeurAttribut
     {
         _estDiscrete = true;
         _valeurDiscrete = valeur;
+    }
+
+    public bool Equals(string? other)
+    {
+        return Valeur.Equals(other);
+    }
+
+    public bool Equals(double other)
+    {
+        return EstDiscrete && _valeurDiscrete.Equals(other);
     }
 
     public override string ToString()

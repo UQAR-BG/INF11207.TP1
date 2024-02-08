@@ -117,7 +117,7 @@ public class Ensemble : TrackableObject, IObserver
     public IList<string> ValeursPossiblesAttribut(string nomAttribut)
     {
         return new UniqueList<string>(
-            Exemples.Select(e => e.GetValeur(nomAttribut)));
+            Exemples.Select(e => e.GetValeur(nomAttribut).Valeur));
     }
 
     public Ensemble SousEnsembleAttribut(string nomAttribut, string valeur)
@@ -130,16 +130,16 @@ public class Ensemble : TrackableObject, IObserver
         return retour;
     }
 
-    public IList<Tuple<string, IList<string>>> SauvegarderValeursDiscretes()
+    public IList<Tuple<string, IList<ValeurAttribut>>> SauvegarderValeursDiscretes()
     {
-        IList<Tuple<string, IList<string>>> retour = new List<Tuple<string, IList<string>>>();
+        IList<Tuple<string, IList<ValeurAttribut>>> retour = new List<Tuple<string, IList<ValeurAttribut>>>();
 
         foreach (string attr in Attributs)
         {
             if (EstDiscretisable(attr))
             {
-                IList<string> valeurs = Exemples.Select(e => e.GetValeur(attr)).ToList();
-                retour.Add(new Tuple<string, IList<string>>(attr, valeurs));
+                IList<ValeurAttribut> valeurs = Exemples.Select(e => e.GetValeur(attr)).ToList();
+                retour.Add(new Tuple<string, IList<ValeurAttribut>>(attr, valeurs));
             }
         }
         
@@ -150,9 +150,9 @@ public class Ensemble : TrackableObject, IObserver
     {
         List<Tuple<double, double>> listeIntervalles = new();
 
-        List<Tuple<int, string>> valeursTriees = new();
+        List<Tuple<int, ValeurAttribut>> valeursTriees = new();
         for (int i = 0; i < Length; i++)
-            valeursTriees.Add(new Tuple<int, string>(i, Exemples[i].GetValeur(attribut)));
+            valeursTriees.Add(new Tuple<int, ValeurAttribut>(i, Exemples[i].GetValeur(attribut)));
 
         valeursTriees.OrderBy(t => t.Item2);
         int indiceBorneInf = 0;
@@ -166,11 +166,11 @@ public class Ensemble : TrackableObject, IObserver
                 if (listeIntervalles.Count == 0)
                     borneInf = double.NegativeInfinity;
                 else
-                    borneInf = (double.Parse(valeursTriees[indiceBorneInf].Item2) + 
-                        double.Parse(valeursTriees[indiceBorneInf - 1].Item2)) / 2;
+                    borneInf = (valeursTriees[indiceBorneInf].Item2.ValeurDiscrete + 
+                        valeursTriees[indiceBorneInf - 1].Item2.ValeurDiscrete) / 2;
 
-                borneSup = (double.Parse(valeursTriees[i].Item2) +
-                        double.Parse(valeursTriees[i - 1].Item2)) / 2;
+                borneSup = (valeursTriees[i].Item2.ValeurDiscrete +
+                        valeursTriees[i - 1].Item2.ValeurDiscrete) / 2;
 
                 listeIntervalles.Add(new Tuple<double, double>(borneInf, borneSup));
                 indiceBorneInf = i;
@@ -184,7 +184,7 @@ public class Ensemble : TrackableObject, IObserver
         {
             foreach (var intervalle in listeIntervalles)
             {
-                if (double.Parse(exemple.GetValeur(attribut)) < intervalle.Item2)
+                if (exemple.GetValeur(attribut).ValeurDiscrete < intervalle.Item2)
                 {
 
                 }
@@ -198,7 +198,8 @@ public class Ensemble : TrackableObject, IObserver
         bool tousDiscretisable = true;
         while (tousDiscretisable && i < Exemples.Count)
         {
-            tousDiscretisable = double.TryParse(Exemples[i].GetValeur(attribut), out var result);
+            //tousDiscretisable = double.TryParse(Exemples[i].GetValeur(attribut), out var result);
+            tousDiscretisable = Exemples[i].GetValeur(attribut).EstDiscrete;
             i++;
         }
 

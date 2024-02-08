@@ -13,6 +13,17 @@ public abstract class NoeudAbstrait
     public string Etiquette { get; init; }
     public bool IsFeuille { get => GetType() == typeof(Feuille); }
 
+    public NoeudAbstrait Follow(ValeurAttribut valeur)
+    {
+        foreach (var decision in _enfants.Keys)
+        {
+            if (decision.Equals(valeur))
+                return _enfants[decision];
+        }
+
+        throw new Exception("Node not found");
+    }
+
     public NoeudAbstrait(string etiquette)
     {
         Etiquette = etiquette;

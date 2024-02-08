@@ -11,6 +11,11 @@ public class Etiquette : IDecision
 
     public bool Equals(ValeurAttribut valeur)
     {
-        return _valeur.Equals(valeur);
+        return _valeur.Equals(valeur.Valeur);
+    }
+
+    public override string ToString()
+    {
+        return _valeur;
     }
 }

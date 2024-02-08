@@ -29,12 +29,12 @@ public abstract class Arbre
     public virtual string Etiqueter(Exemple exemple)
     {
         NoeudAbstrait noeudActuel = Racine;
-        string valeur;
+        ValeurAttribut valeur;
 
         while (!noeudActuel.IsFeuille)
         {
             valeur = exemple.GetValeur(noeudActuel.Etiquette);
-            noeudActuel = noeudActuel[valeur];
+            noeudActuel = noeudActuel.Follow(valeur);
         }
 
         return noeudActuel.Etiquette;
@@ -71,8 +71,9 @@ public abstract class Arbre
         foreach (string valeur in ensemble.ValeursPossiblesAttribut(aTester))
         {
             Ensemble sousEnsemble = ensemble.SousEnsembleAttribut(aTester, valeur);
-
-            noeud[valeur] = ConstruireArbre(sousEnsemble);
+            IDecision branche = new Etiquette(valeur);
+            
+            noeud[branche] = ConstruireArbre(sousEnsemble);
         }
 
         return noeud;
@@ -91,10 +92,10 @@ public abstract class Arbre
             case not null when type == typeof(Noeud):
                 Console.WriteLine(new string('\t', nbTabs) + arbre.Etiquette);
 
-                foreach (string enfant in arbre.Enfants.Keys)
+                foreach (IDecision decision in arbre.Enfants.Keys)
                 {
-                    Console.WriteLine(new string('\t', nbTabs) + '-' + enfant);
-                    AfficherArbre(arbre[enfant], nbTabs + 1);
+                    Console.WriteLine(new string('\t', nbTabs) + '-' + decision);
+                    AfficherArbre(arbre[decision], nbTabs + 1);
                 }
 
                 break;

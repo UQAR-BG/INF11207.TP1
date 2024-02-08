@@ -18,4 +18,9 @@ public class Intervalle : IDecision
     {
         return valeur.ValeurDiscrete >= _intervalle.Item1 && valeur.ValeurDiscrete < _intervalle.Item2;
     }
+    
+    public override string ToString()
+    {
+        return $"{_intervalle.Item1} à {_intervalle.Item2}";
+    }
 }
