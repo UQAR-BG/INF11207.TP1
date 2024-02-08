@@ -11,4 +11,15 @@ public abstract class NoeudAbstrait
         Etiquette = etiquette;
         Enfants = new Dictionary<string, NoeudAbstrait>();
     }
+
+    //public NoeudAbstrait Follow(string valeur)
+    //{
+    //    foreach (var decision in _enfants.Keys)
+    //    {
+    //        if (decision.Equals(valeur))
+    //            return _enfants[decision];
+    //    }
+
+    //    throw new Exception("Node not found");
+    //}
 }
