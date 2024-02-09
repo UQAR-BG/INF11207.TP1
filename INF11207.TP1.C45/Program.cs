@@ -6,10 +6,14 @@ Console.WriteLine("This is a simple app to demonstrate the ID3 decision tree alg
 string chemin = "C:\\Users\\goulba01\\source\\repos\\train_reduced.csv";
 //string chemin = "/home/bastiengoulet/dev/INF11207.TP1/Data/train_reduced.csv";
 
-Arbre arbre = new ArbreC45(chemin);
+string cheminPrevisions = "C:\\Users\\goulba01\\source\\repos\\test_reduced.csv";
+
+Arbre arbre = new ArbreC45(chemin, cheminPrevisions);
 arbre.Construire();
 
 arbre.Afficher();
+
+arbre.Elaguer();
 
 //Console.WriteLine("Étiquettage de la prévision suivante:");
 //Console.WriteLine("Pluvieux, Moyen, Élevée, Faible");

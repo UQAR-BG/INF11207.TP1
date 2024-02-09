@@ -1,19 +1,20 @@
 using INF11207.TP1.Core.Calculs;
 using INF11207.TP1.Core.Exceptions;
-using System.Collections.Generic;
 
 namespace INF11207.TP1.Core;
 
 public abstract class Arbre
 {
     private readonly ICalculAttributOptimal _attributOptimal;
-    
+    private readonly string _cheminElagage;
+
     public Ensemble Ensemble {  get; protected set; }
     public NoeudAbstrait Racine { get; protected set; }
 
-    public Arbre(ICalculAttributOptimal strategie, string chemin = "")
+    public Arbre(ICalculAttributOptimal strategie, string chemin = "", string cheminElagage = "")
     {
         _attributOptimal = strategie;
+        _cheminElagage = cheminElagage;
         Ensemble = new Ensemble(chemin);
     }
     
@@ -35,10 +36,18 @@ public abstract class Arbre
         while (!noeudActuel.IsFeuille)
         {
             valeur = exemple.GetValeur(noeudActuel.Etiquette);
-            noeudActuel = noeudActuel.Enfants[valeur];
+            noeudActuel = noeudActuel.Follow(valeur);
         }
 
         return noeudActuel.Etiquette;
+    }
+
+    public void Elaguer()
+    {
+        if (!string.IsNullOrEmpty(_cheminElagage))
+        {
+            ElaguerNoeud(Racine, new Ensemble(_cheminElagage));
+        }
     }
     
     protected virtual Ensemble PreparerDonnees(Ensemble ensemble)
@@ -63,20 +72,26 @@ public abstract class Arbre
         string aTester = ChoisirAttributATester(ensemble);
         
         NoeudAbstrait noeud = new Noeud(aTester);
-        List<Tuple<double, double>>? intervalles = null;
+
         if (sauvegardeValeurs.Any(t => t.Item1.Equals(aTester)))
-            intervalles = ensemble.Discretiser(aTester);
-
-        foreach (string valeur in ensemble.ValeursPossiblesAttribut(aTester))
         {
-            Ensemble sousEnsemble = ensemble.SousEnsembleAttribut(aTester, valeur);
-            if (sauvegardeValeurs.Any(t => t.Item1.Equals(aTester)))
+            foreach (var intervalle in ensemble.Discretiser(aTester))
             {
-                double valDiscrete = double.Parse(valeur);
-                var intervalle = intervalles.First(i => valDiscrete >= i.Item1 && valDiscrete < i.Item2);
-            }
+                IDecision branche = new Intervalle(intervalle);
+                Ensemble sousEnsemble = ensemble.SousEnsembleAttribut(aTester, branche);
 
-            noeud.Enfants[valeur] = ConstruireArbre(sousEnsemble);
+                noeud[branche] = ConstruireArbre(sousEnsemble);
+            }
+        }
+        else
+        {
+            foreach (string valeur in ensemble.ValeursPossiblesAttribut(aTester))
+            {
+                IDecision branche = new Etiquette(valeur);
+                Ensemble sousEnsemble = ensemble.SousEnsembleAttribut(aTester, branche);
+
+                noeud[branche] = ConstruireArbre(sousEnsemble);
+            }
         }
 
         return noeud;
@@ -95,10 +110,10 @@ public abstract class Arbre
             case not null when type == typeof(Noeud):
                 Console.WriteLine(new string('\t', nbTabs) + arbre.Etiquette);
 
-                foreach (string enfant in arbre.Enfants.Keys)
+                foreach (IDecision branche in arbre.Enfants.Keys)
                 {
-                    Console.WriteLine(new string('\t', nbTabs) + '-' + enfant);
-                    AfficherArbre(arbre.Enfants[enfant], nbTabs + 1);
+                    Console.WriteLine(new string('\t', nbTabs) + '-' + branche);
+                    AfficherArbre(arbre[branche], nbTabs + 1);
                 }
 
                 break;
@@ -125,5 +140,30 @@ public abstract class Arbre
             }
         }
         return new Feuille(etiquettePlusFrequente);
+    }
+
+    private NoeudAbstrait ElaguerNoeud(NoeudAbstrait noeud, Ensemble prévisions)
+    {
+        if (noeud.GetType() == typeof(Feuille))
+            return noeud;
+
+        double proportionInitiale = TauxErreur(prévisions);
+
+        return new Feuille("");
+    }
+
+    private double TauxErreur(Ensemble ensemble)
+    {
+        int nombreDeFaux = 0;
+
+        foreach (Exemple exemple in ensemble.Exemples)
+        {
+            string entrainement = exemple.Etiquette;
+            string prevision = Etiqueter(exemple);
+
+            if (!entrainement.Equals(prevision)) nombreDeFaux++;
+        }
+
+        return nombreDeFaux / (double)ensemble.Length;
     }
 }

@@ -94,7 +94,7 @@ public class Ensemble : TrackableObject, IObserver
 
         foreach (string ligne in exemples)
         {
-            string[] attributs = ligne.Split(';');
+            string[] attributs = ligne.Split(',');
             string etiquette = attributs.Last();
             if (attributs.Length == nomAttributs.Count)
                 nomAttributs.RemoveAt(attributs.Length - 1);
@@ -124,10 +124,15 @@ public class Ensemble : TrackableObject, IObserver
 
     public Ensemble SousEnsembleAttribut(string nomAttribut, string valeur)
     {
+        return SousEnsembleAttribut(nomAttribut, new Etiquette(valeur));
+    }
+
+    public Ensemble SousEnsembleAttribut(string nomAttribut, IDecision decision)
+    {
         Ensemble retour = new Ensemble();
         retour.Attributs = new List<string>(Attributs);
         retour.Attributs.Remove(nomAttribut);
-        retour.Exemples = Exemples.Where(e => e.GetValeur(nomAttribut).Equals(valeur)).ToList();
+        retour.Exemples = Exemples.Where(e => decision.Equals(e.GetValeur(nomAttribut))).ToList();
 
         return retour;
     }
@@ -167,35 +172,22 @@ public class Ensemble : TrackableObject, IObserver
 
             if (!Exemples[valeursTriees[i].Item1].Etiquette.Equals(classe))
             {
-                //if (listeIntervalles.Count == 0)
-                //    borneInf = double.NegativeInfinity;
-                //else
-                //    borneInf = (double.Parse(valeursTriees[indiceBorneInf].Item2) +
-                //        double.Parse(valeursTriees[indiceBorneInf - 1].Item2)) / 2;
-
                 borneSup = (valeursTriees[i].Item2 +
                         valeursTriees[i - 1].Item2) / 2;
 
-                listeIntervalles.Add(new Tuple<double, double>(borneInf, borneSup));
+                if (borneInf < borneSup)
+                {
+                    listeIntervalles.Add(new Tuple<double, double>(borneInf, borneSup));
+                    borneInf = borneSup;
+                    classe = Exemples[valeursTriees[i].Item1].Etiquette;
+                }
+
                 indiceBorneInf = i;
-                borneInf = borneSup;
-                classe = Exemples[valeursTriees[i].Item1].Etiquette;
             }
         }
 
         listeIntervalles.Add(new Tuple<double, double>(borneInf, double.PositiveInfinity));
         return listeIntervalles;
-
-        //foreach (Exemple exemple in Exemples)
-        //{
-        //    foreach (var intervalle in listeIntervalles)
-        //    {
-        //        if (double.Parse(exemple.GetValeur(attribut)) < intervalle.Item2)
-        //        {
-
-        //        }
-        //    }
-        //}
     }
 
     private bool EstDiscretisable(string attribut)
