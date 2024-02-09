@@ -5,17 +5,17 @@ namespace INF11207.TP1.CsvFileHandling;
 
 public static class CsvReader
 {
-    //private static CsvConfiguration _config = new CsvConfiguration(CultureInfo.CurrentCulture)
-    //{
-    //    Delimiter = ";",
-    //};
+    private static CsvConfiguration _config = new CsvConfiguration(CultureInfo.CurrentCulture)
+    {
+        Delimiter = ";",
+    };
 
     public static string[] ReadAttributes(string path)
     {
         string[] headerRow = Array.Empty<string>();
 
         using (var reader = new StreamReader(path))
-        using (var csv = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture))
+        using (var csv = new CsvHelper.CsvReader(reader, _config))
         {
             csv.Read();
             csv.ReadHeader();
@@ -30,7 +30,7 @@ public static class CsvReader
         List<string> lines = new List<string>();
 
         using (var reader = new StreamReader(path))
-        using (var csv = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture))
+        using (var csv = new CsvHelper.CsvReader(reader, _config))
         {
             csv.Read();
             csv.ReadHeader();
