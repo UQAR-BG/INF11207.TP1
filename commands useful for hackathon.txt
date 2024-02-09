@@ -1,0 +1,54 @@
+- targets behind firewalls, check open ports
+
+--- Idle Scan ---
+sudo nmap -Pn -sI <ZOMBIE_HOST_IP> <TARGET_HOST_IP>
+
+--- Xmas Scan --- (TCP SYN packet with unusual flags turned on)
+sudo nmap -sX <TARGET_HOST_IP>
+
+--- FIN Scan ---
+sudo nmap -sF <TARGET_HOST_IP>
+
+
+- packet crafting
+
+--- Malformed data --- (knocking over systems, evading IDS)
+sudo hping3 <TARGET_HOST_IP> -U -S -s 55355 -d 8080
+
+--- Ethernet packet generator ---
+sudo packeth
+
+
+- banner grabbing
+
+(get info on a potential service)
+telnet <TARGET_HOST_IP> <TARGET_PORT> (p. ex. 22)
+
+nc -v <TARGET_DOMAIN> 80
+HEAD / HTTP/1.1
+Host: <TARGET_DOMAIN>
+
+(check mail service)
+dig mx <TARGET_DOMAIN>
+nc -v <TARGET_MAIL_DOMAIN> 25
+
+(for protocols with encryption)
+openssl s_client -connect <TARGET_HOST_IP>:443
+HEAD / HTTP/1.1
+Host: <TARGET_DOMAIN>
+
+
+- enumeration
+
+whois <TARGET_DOMAIN>
+dig @<DOMAIN_SERVER> <TARGET_DOMAIN> axfr
+
+dig @<DOMAIN_SERVER> version.bind txt chaos
+
+net view \\<TARGET_HOST_IP> (windows)
+
+
+- SNMP (Simple Network Management Protocol)
+
+--- SNMP walk --- (system info)
+snmpwalk -v 1 -c public <TARGET_HOST_IP>
